@@ -1,5 +1,5 @@
-# Wallhack
-Wallhack in-wall infrastructure mapping system
+# Wallhack: in-wall infrastructure mapping system
+The Wallhack in-wall infrastructure mapping system is utilizes the Walabot development platform to graphically map the location of wood and metal studs on an image of the wall.
 
 # Workflow Example
 This is an example of a software workflow I want us all to follow:
