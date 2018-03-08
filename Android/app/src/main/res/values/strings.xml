@@ -2,4 +2,5 @@
     <string name="app_name">Wallhack</string>
     <string name="edit_message">Enter a message</string>
     <string name="button_send">Send</string>
+    <string name="scan_start">New Wall Scan</string>
 </resources>
