@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -17,9 +18,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,6 +36,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 public class PictureActivity extends AppCompatActivity {
 
     public static ImageView imageView;
+    public static Button continueButton;
     public static final int IMAGE_GALLERY_REQUEST = 20;
     static final int REQUEST_TAKE_PHOTO = 10;
     public static final int MY_PERMISSIONS_REQUEST_WRITE = 1;
@@ -43,6 +47,7 @@ public class PictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
         imageView = (ImageView)findViewById(R.id.takenPicture);
+        continueButton = (Button)findViewById(R.id.continueButton);
     }
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -67,6 +72,7 @@ public class PictureActivity extends AppCompatActivity {
 
                     // show the image to the user
                     imageView.setImageBitmap(image);
+                    continueButton.setVisibility(View.VISIBLE);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     // show a message to the user indictating that the image is unavailable.
@@ -80,6 +86,7 @@ public class PictureActivity extends AppCompatActivity {
                 galleryAddPic();
                 Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
                 imageView.setImageBitmap(bitmap);
+                continueButton.setVisibility(View.VISIBLE);
             }
             else{
                 ActivityCompat.requestPermissions(this,
@@ -107,6 +114,7 @@ public class PictureActivity extends AppCompatActivity {
                 galleryAddPic();
                 Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
                 imageView.setImageBitmap(bitmap);
+                continueButton.setVisibility(View.VISIBLE);
             }
         }
         // END_INCLUDE(onRequestPermissionsResult)
@@ -182,6 +190,16 @@ public class PictureActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    public void nextActivity(View view){
+        Bitmap bmp = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+        byte[] byteArray = stream.toByteArray();
+        Intent intent = new Intent(this, DrawingActivity.class);
+        intent.putExtra("picture", byteArray);
+        startActivity(intent);
     }
 
 }
