@@ -41,7 +41,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".DrawingActivity"></activity>
+        <activity android:name=".DrawingActivity" android:parentActivityName=".PictureActivity"></activity>
     </application>
 
 </manifest>
