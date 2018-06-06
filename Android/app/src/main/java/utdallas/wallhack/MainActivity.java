@@ -33,11 +33,14 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     private BluetoothAdapter mBluetoothAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        ImageView logo = (ImageView) findViewById(R.id.imageView2);
+        logo.setImageResource(R.drawable.wallhack_logo);
     }
 
     public void startBluetooth (View view) {
