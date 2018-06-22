@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
+import android.icu.util.TimeUnit;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -17,6 +18,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import static utdallas.wallhack.R.id.radio;
 import static utdallas.wallhack.R.id.wallPicture;
 
 public class DrawingActivity extends AppCompatActivity {
@@ -27,6 +35,9 @@ public class DrawingActivity extends AppCompatActivity {
     int w;
     ImageView overlay;
     ImageView image;
+    DisplayMetrics displayMetrics = new DisplayMetrics();
+    int width;
+    ArrayList<WallData> sampleData = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,41 +60,75 @@ public class DrawingActivity extends AppCompatActivity {
         paint = new Paint();
         //paint.setColor(Color.RED);
         paint.setStrokeWidth(55);
-    }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getRawX();
-        float y = event.getRawY();
-
-        /*String xCoord = Float.toString(x);
-        String yCoord = Float.toString(y);
-
-        String coords = xCoord + ", " + yCoord;
-
-        int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(this, coords, duration);
-        toast.show();*/
-        DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int width = displayMetrics.widthPixels;
-        float ratio = x/width;
+        width = displayMetrics.widthPixels;
 
-        if(ratio <= 0.5){
-            paint.setColor(Color.RED);
-        }
-        else{
-            paint.setColor(Color.BLUE);
-        }
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                lineDraw(x,ratio);
-                overlay.invalidate();
-                break;
-        }
-        return true;
+//        try {
+//            File file = new File("testFile.txt");
+//            FileReader fileReader = new FileReader(file);
+//            BufferedReader bufferedReader = new BufferedReader(fileReader);
+//            String line;
+//            while ((line = bufferedReader.readLine()) != null) {
+//                sampleData.add(new WallData(line.split(" ")));
+//            }
+//            fileReader.close();
+//            }
+//            catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        makeTestData();
     }
+
+    private void makeTestData(){
+        sampleData.add(new WallData(300,500,"wood"));
+        sampleData.add(new WallData(700,500,"wood"));
+        sampleData.add(new WallData(1100,500,"wood"));
+        sampleData.add(new WallData(500,500,"wire/pvc"));
+        sampleData.add(new WallData(800,500,"metal"));
+    }
+
+    public void drawTest(View view) {
+        for(WallData wd : sampleData){
+            paint.setColor(wd.getColor());
+            float x = wd.getX();
+            float ratio = x/width;
+            lineDraw(x,ratio);
+            overlay.invalidate();
+        }
+    }
+
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        float x = event.getRawX();
+//        float y = event.getRawY();
+//
+//        /*String xCoord = Float.toString(x);
+//        String yCoord = Float.toString(y);
+//
+//        String coords = xCoord + ", " + yCoord;
+//
+//        int duration = Toast.LENGTH_LONG;
+//        Toast toast = Toast.makeText(this, coords, duration);
+//        toast.show();*/
+//
+//        float ratio = x/width;
+//
+//        if(ratio <= 0.5){
+//            paint.setColor(Color.RED);
+//        }
+//        else{
+//            paint.setColor(Color.BLUE);
+//        }
+//
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                lineDraw(x,ratio);
+//                overlay.invalidate();
+//                break;
+//        }
+//        return true;
+//    }
 
     private void lineDraw(float x,float ratio) {
         float newX = canvas.getWidth()*ratio;
