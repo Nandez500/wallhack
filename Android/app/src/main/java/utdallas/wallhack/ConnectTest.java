@@ -146,7 +146,7 @@ public class ConnectTest extends Activity {
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     //out.append(readMessage);
                     String[] splitMessage = readMessage.split(",");
-                    Constants.WallTarget target = new Constants.WallTarget(
+                    WallData target = new WallData(
                             splitMessage[0], Double.valueOf(splitMessage[1]),
                             Double.valueOf(splitMessage[2]), Double.valueOf(splitMessage[3]),
                             Double.valueOf(splitMessage[4]));
