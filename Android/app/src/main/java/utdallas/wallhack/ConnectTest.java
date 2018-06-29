@@ -70,7 +70,7 @@ public class ConnectTest extends Activity {
 
         commThread = new CommunicationThread(device);
 
-        commThread.run();
+        commThread.start();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ConnectTest extends Activity {
 
         out.append("\n...In onPause()...");
 
-        if (outStream != null) {
+        /*if (outStream != null) {
             try {
                 outStream.flush();
             } catch (IOException e) {
@@ -91,7 +91,7 @@ public class ConnectTest extends Activity {
             btSocket.close();
         } catch (IOException e2) {
             AlertBox("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
-        }
+        }*/
     }
 
     @Override
@@ -125,6 +125,7 @@ public class ConnectTest extends Activity {
     }
 
     public void AlertBox(String title, String message) {
+        Log.e(TAG, message);
         new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message + " Press OK to exit.")
@@ -143,7 +144,14 @@ public class ConnectTest extends Activity {
                 case 0:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    out.append(readMessage);
+                    //out.append(readMessage);
+                    String[] splitMessage = readMessage.split(",");
+                    Constants.WallTarget target = new Constants.WallTarget(
+                            splitMessage[0], Double.valueOf(splitMessage[1]),
+                            Double.valueOf(splitMessage[2]), Double.valueOf(splitMessage[3]),
+                            Double.valueOf(splitMessage[4]));
+                    out.append(target.toString());
+                    Log.i(TAG, "Message Received");
                     break;
             }
         }
@@ -168,8 +176,8 @@ public class ConnectTest extends Activity {
         }
 
         public void run() {
-            out.append("\n...Connecting...");
             setName("CommunicationThread");
+            Log.i(TAG, "Connecting");
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
             byte[] buffer = new byte[1024];
@@ -198,14 +206,14 @@ public class ConnectTest extends Activity {
             inStream = tmpIn;
             outStream = tmpOut;
             isConnected = true;
-            out.append("\n...Connected...");
+            Log.i(TAG, "Connected");
 
             while(isConnected) {
                 try {
                     bytes = inStream.read(buffer);
                     mHandler.obtainMessage(0, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
-                    out.append("\n...Connection Lost...");
+                    Log.e(TAG, "Connection Lost");
                     isConnected = false;
                 }
             }
