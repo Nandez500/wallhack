@@ -1,31 +1,18 @@
 package utdallas.wallhack;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.drawable.BitmapDrawable;
-import android.icu.util.TimeUnit;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import static utdallas.wallhack.R.id.radio;
-import static utdallas.wallhack.R.id.wallPicture;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class DrawingActivity extends AppCompatActivity {
 
@@ -38,6 +25,7 @@ public class DrawingActivity extends AppCompatActivity {
     DisplayMetrics displayMetrics = new DisplayMetrics();
     int width;
     ArrayList<WallData> sampleData = new ArrayList<>();
+    Queue<WallData> dataQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,21 +65,24 @@ public class DrawingActivity extends AppCompatActivity {
 //            catch (IOException e) {
 //            e.printStackTrace();
 //        }
+        dataQueue = new LinkedList<>();
         makeTestData();
     }
 
     private void makeTestData(){
-        sampleData.add(new WallData(300,500,"wood"));
-        sampleData.add(new WallData(700,500,"wood"));
-        sampleData.add(new WallData(1100,500,"wood"));
-        sampleData.add(new WallData(500,500,"wire/pvc"));
-        sampleData.add(new WallData(800,500,"metal"));
+        dataQueue.add(new WallData(300,500,"wood"));
+        dataQueue.add(new WallData(700,500,"wood"));
+        dataQueue.add(new WallData(1100,500,"wood"));
+        dataQueue.add(new WallData(500,500,"wire/pvc"));
+        dataQueue.add(new WallData(800,500,"metal"));
+        dataQueue.add(new WallData(900, 500, "ac"));
     }
 
     public void drawTest(View view) {
-        for(WallData wd : sampleData){
-            paint.setColor(wd.getColor());
-            float x = wd.getX();
+        while(!dataQueue.isEmpty()){
+            WallData data = dataQueue.remove();
+            paint.setColor(data.getColor());
+            float x = data.getX();
             float ratio = x/width;
             lineDraw(x,ratio);
             overlay.invalidate();

@@ -1,46 +1,44 @@
 package utdallas.wallhack;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
+
+import com.yalantis.ucrop.UCrop;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static android.os.Environment.getExternalStoragePublicDirectory;
 
 public class PictureActivity extends AppCompatActivity {
 
     public static ImageView imageView;
     public static Button continueButton;
     public static final int IMAGE_GALLERY_REQUEST = 20;
-    static final int REQUEST_TAKE_PHOTO = 10;
+    public static final int REQUEST_TAKE_PHOTO = 10;
+    public static final int REQUEST_CROP_PHOTO = 30;
     public static final int MY_PERMISSIONS_REQUEST_WRITE = 1;
     public static final int MY_PERMISSIONS_REQUEST_READ = 2;
+    private static String photoPath;
+    private static String croppedPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,39 +58,69 @@ public class PictureActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(resultCode == RESULT_OK) {
             if (requestCode == IMAGE_GALLERY_REQUEST) {
-                Uri imageUri = data.getData();
-
-                InputStream inputStream;
-                try {
-                    inputStream = getContentResolver().openInputStream(imageUri);
-
-                    // get a bitmap from the stream.
-                    Bitmap image = BitmapFactory.decodeStream(inputStream);
-
-
-                    // show the image to the user
-                    imageView.setImageBitmap(image);
-                    continueButton.setVisibility(View.VISIBLE);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    // show a message to the user indictating that the image is unavailable.
-                    Toast.makeText(this, "Unable to open image", Toast.LENGTH_LONG).show();
-                }
+                File f = new File(photoPath);
+                Uri imageUri = FileProvider.getUriForFile(this,"utdallas.wallhack.provider", f);
+                cropPhoto(imageUri);
             }
         }
         if (requestCode == REQUEST_TAKE_PHOTO) {
             if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED) {
                 //Toast.makeText(this, "REQUEST_TAKE_PHOTO", Toast.LENGTH_LONG).show();
                 galleryAddPic();
-                Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
-                imageView.setImageBitmap(bitmap);
-                continueButton.setVisibility(View.VISIBLE);
+                File f = new File(photoPath);
+                Uri contentUri = FileProvider.getUriForFile(this,"utdallas.wallhack.provider", f);
+                cropPhoto(contentUri);
             }
             else{
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_READ);
             }
+        }
+
+//        if (requestCode == REQUEST_CROP_PHOTO){
+//
+//            if (data != null) {
+//                // get the returned data
+//                Bundle extras = data.getExtras();
+//                // get the cropped bitmap
+//                Bitmap selectedBitmap = extras.getParcelable("data");
+//
+//                imageView.setImageBitmap(selectedBitmap);
+//            }
+////            Uri imageUri = data.getData();
+////            InputStream inputStream;
+////            try {
+////                inputStream = getContentResolver().openInputStream(imageUri);
+////
+////                // get a bitmap from the stream.
+////                Bitmap image = BitmapFactory.decodeStream(inputStream);
+////
+////
+////                // show the image to the user
+////                imageView.setImageBitmap(image);
+////                continueButton.setVisibility(View.VISIBLE);
+////            } catch (FileNotFoundException e) {
+////                e.printStackTrace();
+////                // show a message to the user indictating that the image is unavailable.
+////                Toast.makeText(this, "Unable to open image", Toast.LENGTH_LONG).show();
+//////            }
+//
+//            continueButton.setVisibility(View.VISIBLE);
+//        }
+
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            final Uri resultUri = UCrop.getOutput(data);
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
+                imageView.setImageBitmap(bitmap);
+                continueButton.setVisibility(View.VISIBLE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            final Throwable cropError = UCrop.getError(data);
         }
     }
 
@@ -120,7 +148,6 @@ public class PictureActivity extends AppCompatActivity {
         // END_INCLUDE(onRequestPermissionsResult)
     }
 
-
     public void takePicButton(View view){
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
             dispatchTakePictureIntent();
@@ -135,9 +162,10 @@ public class PictureActivity extends AppCompatActivity {
         //Invoke the image gallery with an implicit intent
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
 
-        //Wehere are we finding the data?
+        //Where are we finding the data?
         File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         String pictureDirectoryPath = pictureDirectory.getPath();
+        photoPath = pictureDirectoryPath;
 
         //Represent it as a URI
         Uri data = Uri.parse(pictureDirectoryPath);
@@ -148,7 +176,6 @@ public class PictureActivity extends AppCompatActivity {
         startActivityForResult(photoPickerIntent, IMAGE_GALLERY_REQUEST);
 
     }
-    private static String photoPath;
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -173,15 +200,27 @@ public class PictureActivity extends AppCompatActivity {
 
     private File createImageFile() throws IOException{
         File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String pictureName = getPictureName();
+        String pictureName = getPictureName(false);
         File imageFile = new File(pictureDirectory,pictureName);
         return imageFile;
     }
 
-    private String getPictureName(){
+    private void createCroppedFile()throws IOException{
+        File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String pictureName = getPictureName(true);
+        File croppedFile = new File(pictureDirectory,pictureName);
+        croppedPhotoPath = croppedFile.getAbsolutePath();
+    }
+
+    private String getPictureName(boolean cropped){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String timestamp = sdf.format(new Date());
-        return "wallhack"+timestamp+".jpg";
+        if(cropped){
+            return "wallhack"+timestamp+"CROPPED.jpg";
+        }
+        else {
+            return "wallhack" + timestamp + ".jpg";
+        }
     }
 
     private void galleryAddPic() {
@@ -190,6 +229,43 @@ public class PictureActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    private void galleryAddCroppedPic(){
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(croppedPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
+    private void cropPhoto(Uri sUri){
+        try {
+            File tempFile = new File(getCacheDir(), getPictureName(false));
+
+            if (!tempFile.exists()) {
+                File f = new File(photoPath);
+                Uri imageUri = FileProvider.getUriForFile(this,"utdallas.wallhack.provider", f);
+                InputStream is = getContentResolver().openInputStream(imageUri);
+                FileOutputStream fos = new FileOutputStream(tempFile);
+                byte[] buffer = new byte[1024];
+                int size;
+                while ((size = is.read(buffer)) != -1)
+                    fos.write(buffer, 0, size);
+                fos.close();
+            }
+
+            File tempCropped = new File(getCacheDir(), "tempImgCropped.png");
+            Uri sourceUri = Uri.fromFile(tempFile);
+            Uri destinationUri = Uri.fromFile(tempCropped);
+            UCrop.Options options = new UCrop.Options();
+            options.setFreeStyleCropEnabled(true);
+            UCrop.of(sourceUri, destinationUri)
+                    .withOptions(options)
+                    .start(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void nextActivity(View view){
