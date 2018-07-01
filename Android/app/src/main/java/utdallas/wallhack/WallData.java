@@ -3,6 +3,7 @@ package utdallas.wallhack;
 import java.io.Serializable;
 
 public class WallData implements Serializable {
+
     public final String type;
     public final double angleDeg;
     public final double xPos;
