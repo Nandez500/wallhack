@@ -1,62 +1,41 @@
 package utdallas.wallhack;
 
-import android.graphics.Color;
-
 public class WallData {
-    private int x;
-    private int y;
-    private String mat;
+    public final String type;
+    public final double angleDeg;
+    public final double xPos;
+    public final double yPos;
+    public final double zPos;
 
-    private int color;
-
-    public int getColor() {
-        return color;
+    public WallData(String t, double ang, double x, double y, double z) {
+        type = t;
+        angleDeg = ang;
+        xPos = x;
+        yPos = y;
+        zPos = z;
     }
 
-    public void setColor(int color) {
-        this.color = color;
+    public String toString() {
+        return String.format("type: %s\nangleDeg: %f\nx: %f\ny: %f\nz: %f", type, angleDeg, xPos, yPos, zPos);
     }
 
-     public WallData(int x_, int y_, String mat_){
-         mat = mat_;
-         x = x_;
-         y = y_;
-
-         if (mat == "wood") {
-             color = Color.BLACK;
-         }
-         else if(mat == "wire/pvc") {
-             color = Color.RED;
-         }
-         else if(mat == "metal"){
-             color = Color.LTGRAY;
-         }
-         else if(mat == "ac"){
-             color = Color.YELLOW;
-         }
-     }
-
-    public int getX() {
-        return x;
+    public String getType() {
+        return type;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public double getAngleDeg() {
+        return angleDeg;
     }
 
-    public int getY() {
-        return y;
+    public double getxPos() {
+        return xPos;
     }
 
-    public void setY(int y) {
-        this.y = y;
+    public double getyPos() {
+        return yPos;
     }
 
-    public String getMat() {
-        return mat;
-    }
-
-    public void setMat(String mat) {
-        this.mat = mat;
+    public double getzPos() {
+        return zPos;
     }
 }
