@@ -1,7 +1,5 @@
 package utdallas.wallhack;
 
-import android.graphics.Color;
-
 public class WallData {
     public final String type;
     public final double angleDeg;
@@ -19,5 +17,25 @@ public class WallData {
 
     public String toString() {
         return String.format("type: %s\nangleDeg: %f\nx: %f\ny: %f\nz: %f", type, angleDeg, xPos, yPos, zPos);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public double getAngleDeg() {
+        return angleDeg;
+    }
+
+    public double getxPos() {
+        return xPos;
+    }
+
+    public double getyPos() {
+        return yPos;
+    }
+
+    public double getzPos() {
+        return zPos;
     }
 }
