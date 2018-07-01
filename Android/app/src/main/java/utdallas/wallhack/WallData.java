@@ -5,10 +5,7 @@ import android.graphics.Color;
 public class WallData {
     private int x;
     private int y;
-    private boolean wood;
-    private boolean metal;
-    private boolean pvc;
-    private boolean ac;
+    private String mat;
 
     private int color;
 
@@ -20,21 +17,8 @@ public class WallData {
         this.color = color;
     }
 
-    public WallData(){
-
-        if (wood) {
-            color = Color.BLACK;
-        }
-        else if(ac) {
-            color = Color.RED;
-        }
-        else if(metal){
-            color = Color.LTGRAY;
-        }
-
-    }
-     public WallData(int x_, int y_, String mat){
-         //material = mat;
+     public WallData(int x_, int y_, String mat_){
+         mat = mat_;
          x = x_;
          y = y_;
 
@@ -46,7 +30,9 @@ public class WallData {
          }
          else if(mat == "metal"){
              color = Color.LTGRAY;
-
+         }
+         else if(mat == "ac"){
+             color = Color.YELLOW;
          }
      }
 
@@ -66,35 +52,11 @@ public class WallData {
         this.y = y;
     }
 
-    public boolean isWood() {
-        return wood;
+    public String getMat() {
+        return mat;
     }
 
-    public void setWood(boolean wood) {
-        this.wood = wood;
-    }
-
-    public boolean isMetal() {
-        return metal;
-    }
-
-    public void setMetal(boolean metal) {
-        this.metal = metal;
-    }
-
-    public boolean isPvc() {
-        return pvc;
-    }
-
-    public void setPvc(boolean pvc) {
-        this.pvc = pvc;
-    }
-
-    public boolean isAc() {
-        return ac;
-    }
-
-    public void setAc(boolean ac) {
-        this.ac = ac;
+    public void setMat(String mat) {
+        this.mat = mat;
     }
 }
