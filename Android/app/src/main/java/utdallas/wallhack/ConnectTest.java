@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
+import static android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE;
 
 public class ConnectTest extends Activity {
     TextView out;
@@ -162,7 +163,7 @@ public class ConnectTest extends Activity {
         private final BluetoothDevice btDevice;
         private InputStream inStream;
         private OutputStream outStream;
-        private boolean isConnected = false;
+        private boolean connected = false;
 
         public CommunicationThread(BluetoothDevice device) {
             btDevice = device;
@@ -205,22 +206,37 @@ public class ConnectTest extends Activity {
 
             inStream = tmpIn;
             outStream = tmpOut;
-            isConnected = true;
+            connected = true;
             Log.i(TAG, "Connected");
 
-            while(isConnected) {
+            while(connected) {
                 try {
                     bytes = inStream.read(buffer);
                     mHandler.obtainMessage(0, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "Connection Lost");
-                    isConnected = false;
+                    connected = false;
+                }
+            }
+        }
+
+        public boolean isConnected() {
+            return connected;
+        }
+
+        public void write(byte[] buffer) {
+            if(connected) {
+                try {
+                    outStream.write(buffer);
+
+                } catch (IOException e) {
+                    Log.e(TAG, "Exception during write", e);
                 }
             }
         }
 
         public void cancel() {
-            isConnected = false;
+            connected = false;
             try {
                 btSocket.close();
             } catch (IOException e) {
