@@ -61,12 +61,9 @@
                 android:value=".MainActivity" />
         </activity>
 
-        <activity android:name=".DrawingActivity" android:parentActivityName=".PictureActivity"></activity>
-
         <activity
-            android:name="com.yalantis.ucrop.UCropActivity"git
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:name=".DrawingActivity"
+            android:parentActivityName=".PictureActivity"></activity>
 
     </application>
 
