@@ -14,9 +14,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.yalantis.ucrop.UCrop;
 
@@ -27,18 +30,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Queue;
 
 public class PictureActivity extends AppCompatActivity {
 
     public static ImageView imageView;
     public static Button continueButton;
+    public static EditText heighField;
+    public static EditText widthField;
     public static final int IMAGE_GALLERY_REQUEST = 20;
     public static final int REQUEST_TAKE_PHOTO = 10;
     public static final int REQUEST_CROP_PHOTO = 30;
+    public static final int REQUEST_BLUETOOTH = 40;
     public static final int MY_PERMISSIONS_REQUEST_WRITE = 1;
     public static final int MY_PERMISSIONS_REQUEST_READ = 2;
     private static String photoPath;
     private static String croppedPhotoPath;
+    private Queue<WallData> dataQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +54,8 @@ public class PictureActivity extends AppCompatActivity {
         setContentView(R.layout.activity_picture);
         imageView = (ImageView)findViewById(R.id.takenPicture);
         continueButton = (Button)findViewById(R.id.continueButton);
+        heighField = findViewById(R.id.heightField);
+        widthField = findViewById(R.id.widthField);
     }
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -78,49 +88,24 @@ public class PictureActivity extends AppCompatActivity {
             }
         }
 
-//        if (requestCode == REQUEST_CROP_PHOTO){
-//
-//            if (data != null) {
-//                // get the returned data
-//                Bundle extras = data.getExtras();
-//                // get the cropped bitmap
-//                Bitmap selectedBitmap = extras.getParcelable("data");
-//
-//                imageView.setImageBitmap(selectedBitmap);
-//            }
-////            Uri imageUri = data.getData();
-////            InputStream inputStream;
-////            try {
-////                inputStream = getContentResolver().openInputStream(imageUri);
-////
-////                // get a bitmap from the stream.
-////                Bitmap image = BitmapFactory.decodeStream(inputStream);
-////
-////
-////                // show the image to the user
-////                imageView.setImageBitmap(image);
-////                continueButton.setVisibility(View.VISIBLE);
-////            } catch (FileNotFoundException e) {
-////                e.printStackTrace();
-////                // show a message to the user indictating that the image is unavailable.
-////                Toast.makeText(this, "Unable to open image", Toast.LENGTH_LONG).show();
-//////            }
-//
-//            continueButton.setVisibility(View.VISIBLE);
-//        }
-
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             final Uri resultUri = UCrop.getOutput(data);
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
                 imageView.setImageBitmap(bitmap);
-                continueButton.setVisibility(View.VISIBLE);
+                setElementsVisible();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         } else if (resultCode == UCrop.RESULT_ERROR) {
             final Throwable cropError = UCrop.getError(data);
+        }
+
+        if (requestCode == REQUEST_BLUETOOTH){
+            Bundle bundle = data.getExtras();
+            dataQueue = (Queue<WallData>)bundle.getSerializable("dataQueue");
+            //nextActivity();
         }
     }
 
@@ -142,10 +127,16 @@ public class PictureActivity extends AppCompatActivity {
                 galleryAddPic();
                 Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
                 imageView.setImageBitmap(bitmap);
-                continueButton.setVisibility(View.VISIBLE);
+                setElementsVisible();
             }
         }
         // END_INCLUDE(onRequestPermissionsResult)
+    }
+
+    private void setElementsVisible(){
+        continueButton.setVisibility(View.VISIBLE);
+        heighField.setVisibility(View.VISIBLE);
+        widthField.setVisibility(View.VISIBLE);
     }
 
     public void takePicButton(View view){
@@ -269,13 +260,30 @@ public class PictureActivity extends AppCompatActivity {
     }
 
     public void nextActivity(View view){
-        Bitmap bmp = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 50, stream);
-        byte[] byteArray = stream.toByteArray();
         Intent intent = new Intent(this, DrawingActivity.class);
-        intent.putExtra("picture", byteArray);
-        startActivity(intent);
+        if(TextUtils.isEmpty(heighField.getText())){
+            Toast.makeText(this, "Please enter a heigth", Toast.LENGTH_LONG).show();
+            return;
+        }
+        else if(TextUtils.isEmpty(widthField.getText())){
+            Toast.makeText(this, "Please enter a width", Toast.LENGTH_LONG).show();
+            return;
+        }
+        else {
+            Bitmap bmp = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+            byte[] byteArray = stream.toByteArray();
+            intent.putExtra("picture", byteArray);
+            intent.putExtra("height",Float.parseFloat(heighField.getText().toString()));
+            intent.putExtra("width",Float.parseFloat(widthField.getText().toString()));
+            startActivity(intent);
+        }
+    }
+
+    public void dispatchBluetoothActivity(View view){
+        Intent bluetoothTestIntent = new Intent(this, ConnectTest.class);
+        startActivityForResult(bluetoothTestIntent,REQUEST_BLUETOOTH);
     }
 
 }

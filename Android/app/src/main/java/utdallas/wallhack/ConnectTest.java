@@ -13,11 +13,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
@@ -30,6 +34,7 @@ public class ConnectTest extends Activity {
     private OutputStream outStream = null;
     private InputStream inStream = null;
     private CommunicationThread commThread;
+    private Queue<WallData> dataQueue;
 
     // Well known SPP UUID
     private static final UUID MY_UUID = UUID.fromString("88e2a5aa-1fb9-474a-a915-87457661899f");
@@ -44,6 +49,8 @@ public class ConnectTest extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
+
+        dataQueue = new LinkedList<>();
 
         out = (TextView) findViewById(R.id.out);
 
@@ -145,16 +152,24 @@ public class ConnectTest extends Activity {
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     //out.append(readMessage);
                     String[] splitMessage = readMessage.split(",");
-                    WallData target = new WallData(
-                            splitMessage[0], Double.valueOf(splitMessage[1]),
-                            Double.valueOf(splitMessage[2]), Double.valueOf(splitMessage[3]),
-                            Double.valueOf(splitMessage[4]));
+                    WallData target = new WallData(getApplicationContext(),
+                            splitMessage[0],Float.valueOf(splitMessage[1]),
+                            Float.valueOf(splitMessage[2]), Float.valueOf(splitMessage[3]),
+                            Float.valueOf(splitMessage[4]));
+                    dataQueue.add(target);
                     out.append(target.toString());
                     Log.i(TAG, "Message Received");
                     break;
             }
         }
     };
+
+    public void finishActivity(View view){
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("dataQueue",(Serializable)dataQueue);
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
+    }
 
     private class CommunicationThread extends Thread {
         private final BluetoothSocket btSocket;
@@ -210,7 +225,7 @@ public class ConnectTest extends Activity {
             while(isConnected) {
                 try {
                     bytes = inStream.read(buffer);
-                    mHandler.obtainMessage(0, bytes, -1, buffer).sendToTarget();
+
                 } catch (IOException e) {
                     Log.e(TAG, "Connection Lost");
                     isConnected = false;
