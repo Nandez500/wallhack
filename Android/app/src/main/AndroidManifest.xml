@@ -66,13 +66,13 @@
         </activity>
 
         <activity android:name=".DrawingActivity" android:parentActivityName=".PictureActivity"
-            android:screenOrientation="nosensor"></activity>
+            android:screenOrientation="nosensor">
+        </activity>
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        </activity>
     </application>
-
 </manifest>
