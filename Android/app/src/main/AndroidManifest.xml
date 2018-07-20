@@ -28,24 +28,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".BluetoothListActivity"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="nosensor">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
-
-        <activity
-            android:name=".ConnectTest"
-            android:parentActivityName=".MainActivity"
-            android:screenOrientation="nosensor">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="utdallas.wallhack.provider"

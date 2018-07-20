@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yalantis.ucrop.UCrop;
@@ -38,6 +39,7 @@ public class PictureActivity extends AppCompatActivity {
     public static Button continueButton;
     public static EditText heighField;
     public static EditText widthField;
+    public TextView continueMessage;
     public static final int IMAGE_GALLERY_REQUEST = 20;
     public static final int REQUEST_TAKE_PHOTO = 10;
     public static final int REQUEST_CROP_PHOTO = 30;
@@ -56,6 +58,7 @@ public class PictureActivity extends AppCompatActivity {
         continueButton = (Button)findViewById(R.id.continueButton);
         heighField = findViewById(R.id.heightField);
         widthField = findViewById(R.id.widthField);
+        continueMessage = findViewById(R.id.continueMessage);
     }
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -135,8 +138,7 @@ public class PictureActivity extends AppCompatActivity {
 
     private void setElementsVisible(){
         continueButton.setVisibility(View.VISIBLE);
-        heighField.setVisibility(View.VISIBLE);
-        widthField.setVisibility(View.VISIBLE);
+        continueMessage.setVisibility(View.INVISIBLE);
     }
 
     public void takePicButton(View view){
@@ -186,7 +188,6 @@ public class PictureActivity extends AppCompatActivity {
 
             startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
         }
-
     }
 
     private File createImageFile() throws IOException{
@@ -279,11 +280,6 @@ public class PictureActivity extends AppCompatActivity {
             intent.putExtra("width",Float.parseFloat(widthField.getText().toString()));
             startActivity(intent);
         }
-    }
-
-    public void dispatchBluetoothActivity(View view){
-        Intent bluetoothTestIntent = new Intent(this, ConnectTest.class);
-        startActivityForResult(bluetoothTestIntent,REQUEST_BLUETOOTH);
     }
 
 }
