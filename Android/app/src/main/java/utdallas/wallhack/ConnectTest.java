@@ -25,7 +25,6 @@ import java.util.Queue;
 import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
-import static android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE;
 
 public class ConnectTest extends Activity {
     TextView out;
@@ -146,12 +145,12 @@ public class ConnectTest extends Activity {
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg) {
+        public void handleMessage(Message msg){
             switch (msg.what) {
                 case 0:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    //out.append(readMessage);
+                    out.append(readMessage);
                     String[] splitMessage = readMessage.split(",");
                     WallData target = new WallData(getApplicationContext(),
                             splitMessage[0],Float.valueOf(splitMessage[1]),
@@ -226,7 +225,7 @@ public class ConnectTest extends Activity {
             while(connected) {
                 try {
                     bytes = inStream.read(buffer);
-
+                    mHandler.obtainMessage(0, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "Connection Lost");
                     connected = false;

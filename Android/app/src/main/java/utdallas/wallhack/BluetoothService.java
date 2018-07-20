@@ -1,28 +1,18 @@
 package utdallas.wallhack;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.UUID;
-
-import static android.content.ContentValues.TAG;
-import static android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE;
 
 public class BluetoothService {
     private static final String TAG = "BluetoothService";
@@ -33,8 +23,40 @@ public class BluetoothService {
     private BluetoothSocket btSocket = null;
     private OutputStream outStream = null;
     private InputStream inStream = null;
-    private Handler mHandler = null;
+    //private Handler mHandler = null;
     private CommunicationThread commThread;
+    private Queue<WallData> dataQueue;
+    private Context context;
+    private float testY = 0;
+    private float testX = 0;
+    private float xPos = 0;
+    private float yPos = 0;
+    private float xOffset = 0;
+    private float yOffset = 0;
+    private int count = 0;
+    private Handler mHandler;
+
+    public int getCount(){
+        return count;
+    }
+
+    public Queue<WallData> getDataQueue() {
+        return dataQueue;
+    }
+
+    public float getxPos(){
+        return xPos;
+    }
+
+    public float getyPos(){
+        return yPos;
+    }
+
+    public void reset(){
+        xOffset = xPos;
+        yOffset = yPos;
+        dataQueue.clear();
+    }
 
     // Well known SPP UUID
     private static final UUID MY_UUID = UUID.fromString("88e2a5aa-1fb9-474a-a915-87457661899f");
@@ -43,7 +65,9 @@ public class BluetoothService {
     private static String address = "B8:27:EB:B3:EF:90";
 
     public BluetoothService(Context context, Handler handler) {
+        this.context = context;
         btAdapter = BluetoothAdapter.getDefaultAdapter();
+        dataQueue =  new LinkedList<>();
         mHandler = handler;
     }
 
@@ -64,6 +88,10 @@ public class BluetoothService {
         if(commThread != null) {
             commThread.cancel();
         }
+    }
+
+    public boolean isConnected(){
+        return commThread.isConnected();
     }
 
     private class CommunicationThread extends Thread {
@@ -116,11 +144,11 @@ public class BluetoothService {
             outStream = tmpOut;
             connected = true;
             Log.i(TAG, "Connected");
-
             while(connected) {
                 try {
+
                     bytes = inStream.read(buffer);
-                    mHandler.obtainMessage(Constants.MESSAGE_TARGET, bytes, -1, buffer).sendToTarget();
+                    mHandler.obtainMessage(0, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "Connection Lost");
                     connected = false;

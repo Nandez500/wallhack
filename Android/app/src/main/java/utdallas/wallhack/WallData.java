@@ -10,8 +10,13 @@ public class WallData implements Serializable {
 
     private final String type;
     private final float angleDeg;
-    private final float xPos;
-    private final float yPos;
+    private float xPos;
+
+    public void setyPos(float yPos) {
+        this.yPos = yPos;
+    }
+
+    private float yPos;
     private final float zPos;
     private int color;
     private Bitmap texture;
@@ -36,15 +41,15 @@ public class WallData implements Serializable {
         zPos = z;
 
         switch (type){
-            case "wood":
+            case "Wood":
                 //color = Color.BLACK;
                 texture = BitmapFactory.decodeResource(context.getResources(),R.drawable.wood_texture);
                 break;
-            case "metal":
+            case "Metal":
                 //color =
                 texture = BitmapFactory.decodeResource(context.getResources(),R.drawable.metal_texture);
                 break;
-            case "wire/pvc":
+            case "Wire/PVC":
                 //color = Color.RED;
                 texture = BitmapFactory.decodeResource(context.getResources(),R.drawable.pipe);
                 break;
@@ -52,6 +57,8 @@ public class WallData implements Serializable {
                 //color = Color.YELLOW;
                 texture = BitmapFactory.decodeResource(context.getResources(),R.drawable.lightning);
                 break;
+            default:
+                texture = BitmapFactory.decodeResource(context.getResources(),R.drawable.unknown);
         }
     }
 
@@ -69,6 +76,10 @@ public class WallData implements Serializable {
 
     public float getxPos() {
         return xPos;
+    }
+
+    public void setxPos(float x){
+        this.xPos = x;
     }
 
     public float getyPos() {
