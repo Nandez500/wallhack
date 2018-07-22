@@ -74,6 +74,7 @@ public class PictureActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(resultCode == RESULT_OK) {
             if (requestCode == IMAGE_GALLERY_REQUEST) {
+                setElementsVisible();
                 Uri imageUri = data.getData();
 
                 InputStream inputStream;

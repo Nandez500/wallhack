@@ -222,33 +222,33 @@ public class DrawingActivity extends AppCompatActivity {
     /*******************************************************************************************
      * Drawing Test Methods
      *******************************************************************************************/
-//    private void makeTestData(){
-//        for(int y = 500; y < 1000; y++)
-//            if(y%50 == 0)
-//                dataQueue.add(new WallData(this,"wood",0,1100,y,0));
-//        for(int y = 500; y < 1000; y++)
-//            if(y%50 ==0)
-//                dataQueue.add(new WallData(this,"wire/pvc",0,500,y,0));
-//        for(int y = 500; y < 1000; y++)
-//            if(y%50 ==0)
-//                dataQueue.add(new WallData(this,"metal",0,800,y,0));
-//        for(int y = 500; y < 1000; y++)
-//            if(y%50 == 0)
-//                dataQueue.add(new WallData(this,"ac",0,900, y, 0));
-//    }
+    private void makeTestData(){
+        for(int y = 500; y < 1000; y++)
+            if(y%50 == 0)
+                dataQueue.add(new WallData(this,"wood",0,1100,y,0));
+        for(int y = 500; y < 1000; y++)
+            if(y%50 ==0)
+                dataQueue.add(new WallData(this,"wire/pvc",0,500,y,0));
+        for(int y = 500; y < 1000; y++)
+            if(y%50 ==0)
+                dataQueue.add(new WallData(this,"metal",0,800,y,0));
+        for(int y = 500; y < 1000; y++)
+            if(y%50 == 0)
+                dataQueue.add(new WallData(this,"ac",0,900, y, 0));
+    }
 
-//    public void drawTest(View view) {
-//        makeTestData();
-//        while(!dataQueue.isEmpty()){
-//            WallData data = dataQueue.remove();
-//            float x = data.getxPos();
-//            float scaledX = x/width;
-//            float y = data.getyPos();
-//            float scaledY = y/height;
-//            textureDraw(scaledX,scaledY,data.getTexture());
-//            overlay.invalidate();
-//        }
-//    }
+    public void drawTest(View view) {
+        makeTestData();
+        while(!dataQueue.isEmpty()){
+            WallData data = dataQueue.remove();
+            float x = data.getxPos();
+            float scaledX = x/width;
+            float y = data.getyPos();
+            float scaledY = y/height;
+            textureDraw(scaledX,scaledY,data.getTexture());
+            overlay.invalidate();
+        }
+    }
 
 
     /*******************************************************************************************
