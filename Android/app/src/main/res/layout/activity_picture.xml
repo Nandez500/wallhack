@@ -17,7 +17,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:contentDescription="Picture taken by the camera"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintBottom_toTopOf="@+id/dimensionMessage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -54,9 +54,9 @@
         android:ems="10"
         android:hint="Width (in)"
         android:inputType="numberDecimal"
-        android:selectAllOnFocus="false"
+        android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/continueButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/heightField" />
@@ -74,8 +74,9 @@
         android:ems="10"
         android:hint="Height (in)"
         android:inputType="numberDecimal"
+        android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/continueButton"
         app:layout_constraintEnd_toStartOf="@+id/widthField"
         app:layout_constraintStart_toStartOf="parent" />
@@ -97,7 +98,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/dimensionMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -105,9 +106,8 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
-        android:text="TextView"
         android:textSize="18sp"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/heightField"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -119,10 +119,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="8dp"
+        android:text="Take a picture to continue"
         android:textSize="18sp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/widthField"
+        app:layout_constraintTop_toTopOf="@+id/takenPicture"
         tools:text="Take a picture to continue" />
 </android.support.constraint.ConstraintLayout>

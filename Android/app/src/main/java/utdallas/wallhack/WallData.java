@@ -33,7 +33,17 @@ public class WallData implements Serializable {
         this.color = color;
     }
 
-    public WallData(Context context,String t, float ang, float x, float y, float z) {
+    @Override
+    public String toString() {
+        return "WallData{" +
+                "type='" + type + '\'' +
+                ", xPos=" + xPos +
+                ", yPos=" + yPos +
+                ", texture=" + texture +
+                '}';
+    }
+
+    public WallData(Context context, String t, float ang, float x, float y, float z) {
         type = t;
         angleDeg = ang;
         xPos = x;
@@ -60,10 +70,6 @@ public class WallData implements Serializable {
             default:
                 texture = BitmapFactory.decodeResource(context.getResources(),R.drawable.unknown);
         }
-    }
-
-    public String toString() {
-        return String.format("type: %s\nangleDeg: %f\nx: %f\ny: %f\nz: %f", type, angleDeg, xPos, yPos, zPos);
     }
 
     public String getType() {

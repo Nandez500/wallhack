@@ -26,6 +26,7 @@ import com.yalantis.ucrop.UCrop;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +41,7 @@ public class PictureActivity extends AppCompatActivity {
     public static EditText heighField;
     public static EditText widthField;
     public TextView continueMessage;
+    public TextView dimensionMessage;
     public static final int IMAGE_GALLERY_REQUEST = 20;
     public static final int REQUEST_TAKE_PHOTO = 10;
     public static final int REQUEST_CROP_PHOTO = 30;
@@ -59,6 +61,7 @@ public class PictureActivity extends AppCompatActivity {
         heighField = findViewById(R.id.heightField);
         widthField = findViewById(R.id.widthField);
         continueMessage = findViewById(R.id.continueMessage);
+        dimensionMessage = findViewById(R.id.dimensionMessage);
     }
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -71,9 +74,24 @@ public class PictureActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if(resultCode == RESULT_OK) {
             if (requestCode == IMAGE_GALLERY_REQUEST) {
-                File f = new File(photoPath);
-                Uri imageUri = FileProvider.getUriForFile(this,"utdallas.wallhack.provider", f);
-                cropPhoto(imageUri);
+                Uri imageUri = data.getData();
+
+                InputStream inputStream;
+                try {
+                    inputStream = getContentResolver().openInputStream(imageUri);
+
+                    // get a bitmap from the stream.
+                    Bitmap image = BitmapFactory.decodeStream(inputStream);
+
+
+                    // show the image to the user
+                    imageView.setImageBitmap(image);
+                    continueButton.setVisibility(View.VISIBLE);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    // show a message to the user indictating that the image is unavailable.
+                    Toast.makeText(this, "Unable to open image", Toast.LENGTH_LONG).show();
+                }
             }
         }
         if (requestCode == REQUEST_TAKE_PHOTO) {
@@ -139,6 +157,9 @@ public class PictureActivity extends AppCompatActivity {
     private void setElementsVisible(){
         continueButton.setVisibility(View.VISIBLE);
         continueMessage.setVisibility(View.INVISIBLE);
+        heighField.setVisibility(View.VISIBLE);
+        widthField.setVisibility(View.VISIBLE);
+        dimensionMessage.setVisibility(View.VISIBLE);
     }
 
     public void takePicButton(View view){

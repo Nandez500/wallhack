@@ -45,7 +45,11 @@ public class DrawingActivity extends AppCompatActivity {
     private float testY = 0;
     private float xPos = 0;
     private float yPos = 0;
+    private float xOffset = 2.5f;
+    private float yOffset = 6.5f;
     private int display = 0;
+    private float xScale;
+    private float yScale;
 
     private static String address = "B8:27:EB:B3:EF:90";
     private BluetoothAdapter btAdapter;
@@ -54,7 +58,6 @@ public class DrawingActivity extends AppCompatActivity {
 
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
-
         @Override
         public void handleMessage(Message msg){
             switch (display) {
@@ -78,7 +81,6 @@ public class DrawingActivity extends AppCompatActivity {
 
             switch (msg.what) {
                 case 0:
-
                     /**
                      Read a message
                      */
@@ -93,42 +95,45 @@ public class DrawingActivity extends AppCompatActivity {
                     /**
                      If it's walabot data...
                      */
-                    Log.i(TAG,"Message: "+readMessage+"/nLength: "+splitMessage.length);
-                    if(splitMessage.length == 5) {
-                        //Toast.makeText(getApplicationContext(),readMessage, Toast.LENGTH_LONG).show();
-                        try {
-                            WallData target = new WallData(getApplicationContext(),
-                                    splitMessage[0], Float.valueOf(splitMessage[1]),
-                                    Float.valueOf(splitMessage[2]), Float.valueOf(splitMessage[3]),
-                                    Float.valueOf(splitMessage[4]));
-                            //target.setyPos(yPos-yOffset);
-                            //target.setxPos(xPos-xOffset);
-                            target.setxPos(testX);
-                            target.setyPos(testY);
-                            incrementTestPos();
-                            //dataQueue.add(target);
-                            plotPoint(target);
-                        }catch (NumberFormatException e){
-                            Log.i(TAG,"Error processing input: "+readMessage);
-                        }
-                        break;
-                    }
+                    //Log.i(TAG, "Message: " + readMessage + "/nLength: " + splitMessage.length);
 
-                    /**
-                     If it's locatioin data...
-                     */
-                    else if(splitMessage.length == 3){
-                        try {
-                            xPos = Float.valueOf(splitMessage[0]);
-                            yPos = Float.valueOf(splitMessage[1]);
-                        }catch (NumberFormatException e){
-                            Log.i(TAG,"Error processing input: "+ readMessage);
+                    switch (splitMessage.length) {
+                        case 5:
+                            //Toast.makeText(getApplicationContext(),readMessage, Toast.LENGTH_LONG).show();
+                            try {
+                                WallData target = new WallData(getApplicationContext(),
+                                        splitMessage[0], Float.valueOf(splitMessage[1]),
+                                        Float.valueOf(splitMessage[2]), Float.valueOf(splitMessage[3]),
+                                        Float.valueOf(splitMessage[4]));
+                                target.setyPos(yPos + yOffset);
+                                target.setxPos(xPos + xOffset);
+                                //target.setxPos(testX);
+                                //target.setyPos(testY);
+                                //incrementTestPos();
+                                //dataQueue.add(target);
+                                Log.i(TAG, "Plotting: " + target.toString());
+                                Log.i(TAG,"At Location " + target.getxPos()*xScale + "," + target.getyPos()*yScale);
+                                plotPoint(target);
+                            } catch (NumberFormatException e) {
+                                Log.i(TAG, "Error processing input: " + readMessage);
+                            }
                             break;
-                        }
-                        count ++;
+                        /**
+                         If it's locatioin data...
+                         */
+                        case 2:
+                            try {
+                                xPos = Float.valueOf(splitMessage[0]);
+                                yPos = -1*Float.valueOf(splitMessage[1]);
+                            } catch (NumberFormatException e) {
+                                Log.i(TAG, "Error processing input: " + readMessage);
+                                break;
+                            }
+                            count++;
+                            break;
+                        default:
+                            Log.e(TAG,"Input format error: " + readMessage);
                     }
-                    else
-                        break;
             }
         }
     };
@@ -139,6 +144,11 @@ public class DrawingActivity extends AppCompatActivity {
             testX = 0;
             testY += 100;
         }
+    }
+
+    public void resetScanning(View view){
+        xOffset = xPos;
+        yOffset = yPos;
     }
 
     @Override
@@ -172,9 +182,16 @@ public class DrawingActivity extends AppCompatActivity {
 
         canvas = new Canvas(overlayBmp);
 
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        width = displayMetrics.widthPixels;
-        height = displayMetrics.heightPixels;
+        Log.i(TAG,"Canvas Width: "+canvas.getWidth());
+        Log.i(TAG,"Canvas Height: "+canvas.getHeight());
+
+        xScale = canvas.getWidth()/wallWidth;
+        yScale = canvas.getHeight()/wallHeight;
+
+
+//        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        width = displayMetrics.widthPixels;
+//        height = displayMetrics.heightPixels;
     }
 
     /*******************************************************************************************
@@ -197,45 +214,41 @@ public class DrawingActivity extends AppCompatActivity {
             scanningButton.setVisibility(View.INVISIBLE);
             resetButton.setVisibility(View.INVISIBLE);
             scanning = false;
-            plotData();
-            //dataQueue = bluetoothService.getDataQueue();
+            //plotData();
         }
     }
 
-    public void resetButton(View view){
-        bluetoothService.reset();
-    }
 
     /*******************************************************************************************
      * Drawing Test Methods
      *******************************************************************************************/
-    private void makeTestData(){
-        for(int y = 500; y < 1000; y++)
-            if(y%50 == 0)
-                dataQueue.add(new WallData(this,"wood",0,1100,y,0));
-        for(int y = 500; y < 1000; y++)
-            if(y%50 ==0)
-                dataQueue.add(new WallData(this,"wire/pvc",0,500,y,0));
-        for(int y = 500; y < 1000; y++)
-            if(y%50 ==0)
-                dataQueue.add(new WallData(this,"metal",0,800,y,0));
-        for(int y = 500; y < 1000; y++)
-            if(y%50 == 0)
-                dataQueue.add(new WallData(this,"ac",0,900, y, 0));
-    }
+//    private void makeTestData(){
+//        for(int y = 500; y < 1000; y++)
+//            if(y%50 == 0)
+//                dataQueue.add(new WallData(this,"wood",0,1100,y,0));
+//        for(int y = 500; y < 1000; y++)
+//            if(y%50 ==0)
+//                dataQueue.add(new WallData(this,"wire/pvc",0,500,y,0));
+//        for(int y = 500; y < 1000; y++)
+//            if(y%50 ==0)
+//                dataQueue.add(new WallData(this,"metal",0,800,y,0));
+//        for(int y = 500; y < 1000; y++)
+//            if(y%50 == 0)
+//                dataQueue.add(new WallData(this,"ac",0,900, y, 0));
+//    }
 
-    public void drawTest(View view) {
-        makeTestData();
-        while(!dataQueue.isEmpty()){
-            WallData data = dataQueue.remove();
-            float x = data.getxPos();
-            float scaledX = x/width;
-            float y = data.getyPos();
-            float scaledY = y/height;
-            textureDraw(scaledX,scaledY,data.getTexture());
-            overlay.invalidate();
-        }
-    }
+//    public void drawTest(View view) {
+//        makeTestData();
+//        while(!dataQueue.isEmpty()){
+//            WallData data = dataQueue.remove();
+//            float x = data.getxPos();
+//            float scaledX = x/width;
+//            float y = data.getyPos();
+//            float scaledY = y/height;
+//            textureDraw(scaledX,scaledY,data.getTexture());
+//            overlay.invalidate();
+//        }
+//    }
 
 
     /*******************************************************************************************
@@ -249,11 +262,7 @@ public class DrawingActivity extends AppCompatActivity {
             if(!dataQueue.isEmpty() && dataQueue != null) {
                 while(!dataQueue.isEmpty()) {
                     WallData data = dataQueue.remove();
-                    float x = data.getxPos();
-                    float scaledX = x / width;
-                    float y = data.getyPos();
-                    float scaledY = y / height;
-                    textureDraw(scaledX, scaledY, data.getTexture());
+                    textureDraw(data.getxPos()*xScale, data.getyPos()*yScale, data.getTexture());
                     overlay.invalidate();
                 }
             }
@@ -262,17 +271,17 @@ public class DrawingActivity extends AppCompatActivity {
 
     private void plotPoint(WallData data){
         float x = data.getxPos();
-        float scaledX = x / width;
+        float scaledX = x * xScale;
         float y = data.getyPos();
-        float scaledY = y / height;
+        float scaledY = y * yScale;
         textureDraw(scaledX, scaledY, data.getTexture());
         overlay.invalidate();
     }
 
     private void textureDraw(float scaledX,float scaledY,Bitmap texture){
-        float newX = canvas.getWidth()*scaledX;
-        float newY = canvas.getHeight()*scaledY;
-        RectF rectF = new RectF(newX,newY,newX+100,newY+100);
+//        float newX = canvas.getWidth()*scaledX;
+//        float newY = canvas.getHeight()*scaledY;
+        RectF rectF = new RectF(scaledX,scaledY,scaledX+100,scaledY+100);
         canvas.drawBitmap(texture,null,rectF,null);
     }
 }
